@@ -5,165 +5,181 @@ function ticTacToe(playersMoves){
         [false, false, false]
     ];
 
-    let isThereMoreSpace = true;
-    let winner = 'no';
+    let moves = [];
 
-    for (let i = 0; i < playersMoves.length; i += 2) {
-        let playerOneTurnTaken = false;
-        while (!playerOneTurnTaken){
+    for (let i = 0; i < playersMoves.length; i++) {
+        moves.push(playersMoves[i].split(' ').map(a => Number(a)));
+    }
 
-            let rowNumberPlayerOne = Number(playersMoves[i].split(' ')[0]);
-            let colNumberPlayerOne = Number(playersMoves[i].split(' ')[1]);
+    let playerOne = 'X';
+    let playerTwo = 'O';
 
-            if (board[rowNumberPlayerOne][colNumberPlayerOne] === false){
-                board[rowNumberPlayerOne][colNumberPlayerOne] = 'X';
-
-                playerOneTurnTaken = true;
+    for (let i = 0; i < moves.length; i++) {
+        //player 1 turn
+        let isPlayerOneTurn = true;
+        while (isPlayerOneTurn){
+            if (isThisPositionAvailable(moves[i][0], moves[i][1], board)){
+                board[moves[i][0]][moves[i][1]] = playerOne;
+                i++;
+                isPlayerOneTurn = false;
             } else {
                 console.log('This place is already taken. Please choose another!');
                 i++;
             }
 
-            if (checkWinner(board) !== 'no'){
-                winner = checkWinner(board);
+            if (i >= moves.length){
                 break;
             }
         }
 
-
-
-        console.log(isThereFalse(board));
-
-        if (!isThereFalse(board) || checkWinner(board) !== 'no'){
-            isThereMoreSpace = false;
+        if (i >= moves.length){
             break;
         }
 
-        let playerTwoTurnTaken = false;
-        while (!playerTwoTurnTaken){
-            let rowNumberPlayerTwo = Number(playersMoves[i].split(' ')[0]);
-            let colNumberPlayerTwo = Number(playersMoves[i].split(' ')[1]);
+        //check if there is a winner
+        if (winner(board) !== 'no'){
+            break;
+        }
 
-            if (board[rowNumberPlayerTwo][colNumberPlayerTwo] === false){
-                board[rowNumberPlayerTwo][colNumberPlayerTwo] = 'O';
+        //check if the board is full
+        if (!isThereFalseOnBoard(board)){
+            break;
+        }
 
-                playerOneTurnTaken = true;
+        //if there still available space on the board
+        //player 2 turn
+        let isPlayerTwoTurn = true;
+        while (isPlayerTwoTurn){
+            if (isThisPositionAvailable(moves[i][0], moves[i][1], board)){
+                board[moves[i][0]][moves[i][1]] = playerTwo;
+                isPlayerTwoTurn = false;
             } else {
                 console.log('This place is already taken. Please choose another!');
                 i++;
             }
 
-            if (checkWinner(board) !== 'no'){
-                winner = checkWinner(board);
+            if (i >= moves.length){
+                break;
             }
         }
 
-        if (!isThereFalse(board) || checkWinner(board) !== 'no'){
-            isThereMoreSpace = false;
+        if (i >= moves.length){
+            break;
+        }
+
+        //check if there is a winner
+        if (winner(board) !== 'no'){
+            break;
+        }
+
+        //check if the board is full
+        if (!isThereFalseOnBoard(board)){
             break;
         }
     }
 
-    if (winner !== 'no'){
-        console.log(`Player ${winner} wins!`);
-    } else {
+    if (winner(board) === 'no'){
         console.log('The game ended! Nobody wins :(');
+    } else {
+        console.log(`Player ${winner(board)} wins!`);
     }
 
     for (let i = 0; i < board.length; i++) {
-        console.log(`${board[i].join('\t')}`);
+        console.log(board[i].join('\t'));
     }
 
-    function checkWinner(board){
-        let winner = 'no';
-
-        //check diagonals
-        let firstSymbol = board[0][0];
-        let isWinning = true;
+    function winner(board){
+        //check if there is a winner on any of the diagonals
+        let initialValue = board[0][0];
+        let diagonalWinner = true;
 
         for (let i = 0; i < board.length; i++) {
-            if(board[i][i] !== firstSymbol || firstSymbol === false){
-                isWinning = false;
+            if (board[i][i] === false || initialValue !== board[i][i]){
+                diagonalWinner = false;
                 break;
             }
         }
 
-        if (isWinning){
-            return firstSymbol;
+        if (diagonalWinner){
+            return initialValue;
         }
 
-        firstSymbol = board[0][board.length - 1];
-        isWinning = true;
+        initialValue = board[0][board.length - 1];
+        diagonalWinner = false;
 
         for (let i = 0; i < board.length; i++) {
-            if(board[i][board.length - i] !== firstSymbol || firstSymbol === false){
-                isWinning = false;
+            if (board[i][board.length - i - 1] === false || initialValue !== board[i][board.length - i - 1]){
+                diagonalWinner = false;
                 break;
             }
         }
 
-        if (isWinning){
-            return firstSymbol;
+        if (diagonalWinner){
+            return initialValue;
         }
 
-        //check rows
-        isWinning = true;
-
+        //check any row winner
         for (let i = 0; i < board.length; i++) {
-            firstSymbol = board[i][0];
+            initialValue = board[i][0];
+            let isRowWinner = true;
 
             for (let j = 0; j < board[i].length; j++) {
-                if(board[i][j] !== firstSymbol || firstSymbol === false){
-                    isWinning = false;
+                if (board[i][j] === false || initialValue !== board[i][j]){
+                    isRowWinner = false;
                     break;
                 }
             }
-        }
 
-        if (isWinning){
-            return firstSymbol;
-        }
-
-        //check cols
-        isWinning = true;
-
-        for (let i = 0; i < board.length; i++) {
-            firstSymbol = board[0][i];
-
-            for (let j = 0; j < board[i].length; j++) {
-                if(board[j][i] !== firstSymbol || firstSymbol === false){
-                    isWinning = false;
-                    break;
-                }
+            if (isRowWinner){
+                return initialValue;
             }
         }
 
-        if (isWinning){
-            return firstSymbol;
+        //check for col winner
+        for (let i = 0; i < board.length; i++) {
+            initialValue = board[0][i];
+            let isColWinner = true;
+
+            for (let j = 0; j < board.length; j++) {
+                if (board[j][i] === false || initialValue !== board[j][i]){
+                    isColWinner = false;
+                    break;
+                }
+            }
+
+            if (isColWinner){
+                return initialValue;
+            }
         }
 
         return 'no';
     }
 
-    function isThereFalse(array){
-        for (let i = 0; i < array.length; i++) {
-            if (array[i].some(a => a === false)){
+    function isThisPositionAvailable(x, y, board){
+        return !board[x][y];
+    }
+
+    function isThereFalseOnBoard (board){
+
+        for (let i = 0; i < board.length; i++) {
+            if (board[i].some(a => a === false)){
                 return true;
             }
         }
 
         return false;
     }
+
 }
 
-ticTacToe(["0 1",
+ticTacToe(["0 0",
     "0 0",
-    "0 2",
-    "2 0",
-    "1 0",
-    "1 2",
     "1 1",
-    "2 1",
+    "0 1",
+    "1 2",
+    "0 2",
     "2 2",
-    "0 0"]
+    "1 2",
+    "2 2",
+    "2 1"]
 );
