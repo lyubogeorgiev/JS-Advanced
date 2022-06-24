@@ -11,9 +11,9 @@ function townsToJSON(input){
 
         objectsArray.push(
             {
-                Town: town,
-                Latitude: Number(latitude.toFixed(2)),
-                Longitude: Number(longitude.toFixed(2))
+                [title1]: town,
+                [title2]: Number(latitude.toFixed(2)),
+                [title3]: Number(longitude.toFixed(2))
             }
         );
     }
