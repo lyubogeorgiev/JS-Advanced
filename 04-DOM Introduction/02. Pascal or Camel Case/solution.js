@@ -25,8 +25,6 @@ function solve() {
       firstLetter = firstLetter.toLowerCase();
 
       return firstLetter + rest.join('');
-
-
   }
 
   function convertToPascalCase(input){
